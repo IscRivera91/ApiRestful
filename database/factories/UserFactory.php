@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -28,6 +29,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
+            'verified' => $verified = $this->faker->randomElement([User::USER_IS_VERIFIED,User::USER_IS_NOT_VERIFIED]),
+            'verification_token' => $verified == User::USER_IS_VERIFIED ? null : User::generateVerificationToken(),
+            'admin' => $this->faker->randomElement([User::IS_ADMIN,User::IS_NOT_ADMIN]),
         ];
     }
 
