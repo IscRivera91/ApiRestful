@@ -19,7 +19,10 @@ class DatabaseSeeder extends Seeder
     {
          User::factory(200)->create();
          Category::factory(30)->create();
-         Product::factory(1000)->create();
+         Product::factory(1000)->create()->each(function ($product) {
+             $categories_ids = Category::all()->random(rand(1,5))->pluck('id');
+             $product->categories()->attach($categories_ids);
+         });
          Transaction::factory(1000)->create();
     }
 }
