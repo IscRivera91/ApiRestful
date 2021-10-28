@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,17 +15,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $users = User::all();
+        return response()->json(['data' => $users], 200);
     }
 
     /**
@@ -35,7 +27,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        $fields['name'] = $validated['name'];
+        $fields['email'] = $validated['email'];
+        $fields['password'] = bcrypt($validated['password']);
+        $fields['verified'] = User::USER_IS_NOT_VERIFIED;
+        $fields['verification_token'] = User::generateVerificationToken();
+        $fields['admin'] = User::IS_NOT_ADMIN;
+
+        $user = User::create($fields);
+        return response()->json(['data' => $user], 201);
     }
 
     /**
@@ -46,18 +52,8 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(int $id)
-    {
-        //
+        $user = User::findOrFail($id);
+        return response()->json(['data' => $user], 200);
     }
 
     /**
