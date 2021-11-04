@@ -39,7 +39,9 @@ class UserController extends Controller
         $fields['verified'] = User::USER_IS_NOT_VERIFIED;
         $fields['verification_token'] = User::generateVerificationToken();
         $fields['admin'] = User::IS_NOT_ADMIN;
-
+        /**
+         * @param User \Illuminate\Database\Eloquent\Model
+         */
         $user = User::create($fields);
         return response()->json(['data' => $user], 201);
     }
@@ -65,7 +67,42 @@ class UserController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'email' => 'email|unique:users,email,' . $user->id,
+            'password' => 'min:6|confirmed',
+            'admin' => 'in:' . User::IS_ADMIN . ', ' . User::IS_NOT_ADMIN
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if (isset($validated['email']) && $user->email != $validated['email']) {
+            $user->verified = User::USER_IS_NOT_VERIFIED;
+            $user->verification_token = User::generateVerificationToken();
+            $user->email = $validated['email'];
+        }
+
+        if (isset($validated['password'])) {
+            $user->password = bcrypt($validated['password']);
+        }
+
+        if (isset($validated['admin'])) {
+            if (!$user->isVerified()){
+                return  response()->json(['error'=> 'Only the Verified Users can be admins', 'code' => 409],409);
+            }
+            $user->admin = $validated['admin'];
+        }
+
+        if (!$user->isDirty()) {
+            return  response()->json(['error'=> 'At least one field must be modified', 'code' => 422],422);
+        }
+
+        $user->save();
+        return response()->json(['data' => $user], 200);
+
     }
 
     /**
@@ -76,6 +113,8 @@ class UserController extends Controller
      */
     public function destroy(int $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['data' => $user], 200);
     }
 }
