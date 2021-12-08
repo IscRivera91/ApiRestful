@@ -24,10 +24,10 @@ class BuyerController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $buyer = Buyer::query()->has('transactions')->findOrFail($id);
         return response()->json(['data' => $buyer, 'code' => 200]);
