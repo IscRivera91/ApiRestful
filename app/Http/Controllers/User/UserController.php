@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class UserController extends Controller
     public function index(): JsonResponse
     {
         $users = User::all();
-        return response()->json(['data' => $users]);
+        return $this->showAll($users);
     }
 
     /**
@@ -43,8 +43,8 @@ class UserController extends Controller
         /**
          * @param User \Illuminate\Database\Eloquent\Model
          */
-        $user = User::create($fields);
-        return response()->json(['data' => $user], 201);
+        $user = User::query()->create($fields);
+        return $this->showOne($user);
     }
 
     /**
@@ -55,8 +55,8 @@ class UserController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $user = User::findOrFail($id);
-        return response()->json(['data' => $user]);
+        $user = User::query()->findOrFail($id);
+        return $this->showOne($user);
     }
 
     /**
@@ -68,7 +68,7 @@ class UserController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $user = User::findOrFail($id);
+        $user = User::query()->findOrFail($id);
 
         $validated = $request->validate([
             'email' => 'email|unique:users,email,' . $user->id,
@@ -102,7 +102,7 @@ class UserController extends Controller
         }
 
         $user->save();
-        return response()->json(['data' => $user]);
+        return $this->showOne($user);
 
     }
 
@@ -114,8 +114,8 @@ class UserController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $user = User::findOrFail($id);
+        $user = User::query()->findOrFail($id);
         $user->delete();
-        return response()->json(['data' => $user]);
+        return $this->showOne($user);
     }
 }
