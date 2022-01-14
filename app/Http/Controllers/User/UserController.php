@@ -44,7 +44,7 @@ class UserController extends ApiController
          * @param User \Illuminate\Database\Eloquent\Model
          */
         $user = User::query()->create($fields);
-        return $this->showOne($user);
+        return $this->showOne($user,201);
     }
 
     /**
