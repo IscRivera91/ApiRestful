@@ -98,7 +98,7 @@ class UserController extends ApiController
         }
 
         if (!$user->isDirty()) {
-            return  response()->json(['error'=> 'At least one field must be modified', 'code' => 422],422);
+            return  $this->errorResponse('At least one field must be modified',422);
         }
 
         $user->save();
