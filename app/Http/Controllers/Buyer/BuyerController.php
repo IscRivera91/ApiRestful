@@ -15,7 +15,7 @@ class BuyerController extends ApiController
      */
     public function index(): JsonResponse
     {
-        $buyers = Buyer::query()->has('transactions')->get();
+        $buyers = Buyer::query()->get();
         return $this->showAll($buyers);
     }
 
@@ -25,9 +25,8 @@ class BuyerController extends ApiController
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(Buyer $buyer): JsonResponse
     {
-        $buyer = Buyer::query()->has('transactions')->findOrFail($id);
         return $this->showOne($buyer);
     }
 

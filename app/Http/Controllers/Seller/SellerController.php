@@ -15,7 +15,7 @@ class SellerController extends ApiController
      */
     public function index(): JsonResponse
     {
-        $sellers = Seller::query()->has('products')->get();
+        $sellers = Seller::query()->get();
         return  $this->showAll($sellers);
     }
 
@@ -25,9 +25,8 @@ class SellerController extends ApiController
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(Seller $seller): JsonResponse
     {
-        $seller = Seller::query()->has('products')->findOrFail($id);
         return $this->showOne($seller);
     }
 
